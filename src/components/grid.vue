@@ -11,10 +11,11 @@
     <thead>
       <tr>
         <th v-if="isShowAction"><input type="checkbox" value="true" v-model="isSelectedAll" />&nbsp;</th>
-        <th v-for="item in grides"
-          :class="{active: sortitem === item.name}">
-          <a href="#">{{item.name | capitalize}}
-            <span class="caret" v-show="sortOrders[item.name] < 0"></span>
+        <th v-for="key in columns"
+          @click="sortBy(key.name)"
+          :class="{active: sortKey === key.name}">
+          <a href="#">{{key.name}}
+            <span class="caret" v-show="sortOrders[key.name] < 0"></span>
           </a>
         </th>
       </tr>
@@ -22,8 +23,8 @@
     <tbody>
       <tr v-for="entry in gridData">
         <td v-if="isShowAction"><input type="checkbox" true-value="true" false-value="false" v-model="entry.isChecked" /></td>
-        <td v-for="item in grides">
-          {{entry[item.name]}}
+        <td v-for="key in columns">
+          {{entry[key.name]}}
         </td>
       </tr>
     </tbody>
@@ -44,30 +45,30 @@
 		      <thead>
 		        <tr>
 		          <th>&nbsp;</th>
-		          <th v-for="item in grides">{{item.title}}</th>
+		          <th v-for="key in columns">{{key.title}}</th>
 		        </tr>
 		      </thead>
 		      <tbody>
 		        <tr v-for="entry in gridData
 		        	       |filterBy true in 'isChecked'">
-		          <td><input name="chkEntry" type="radio" true-value="true" false-value="false" @click="select(entry)" /></td>
-		          <td v-for="item in grides">
-		           <field :value.sync="entry[item.name]" :type="item.type" :options="item.options"></field>
+		          <td><input type="radio" true-value="true" false-value="false" @click="select(entry)" /></td>
+		          <td v-for="key in columns">
+		           <field :value.sync="entry[key.name]" :type="key.type" :options="key.options"></field>
 		          </td>
 		        </tr>
 		      </tbody>
             </table>
             <fieldset>
 		      <legend>Details</legend>
-		      <div v-for="item in grides">
-                  <label>{{item.title}}</label>
-                  <field :value.sync="selectedRow[item.name]" :type="item.type" :options="item.options"></field>
+		      <div v-for="key in columns">
+                  <label>{{key.title}}</label>
+                  <field :value.sync="selectedRow[key.name]" :type="key.type" :options="key.options"></field>
               </div>
            </fieldset>
 	     </div>
 	     <div slot="modal-footer" class="modal-footer">
 	    <button type="button" class="btn btn-default" @click='showEditModal = false'>Cancel</button>
-	    <button type="button" class="btn btn-success">Save</button>
+	    <button type="button" class="btn btn-success" @click='save'>Save</button>
 	    </div>
 	</modal>
 	</div>
@@ -81,8 +82,8 @@ export default {components: {
   modal},
   props: {
     gridData: Array,
-    grides: Array,
-    sortitem: String,
+    sortKey: String,
+    columns:Array,
     order: String,
     selectedRow: Object,
     onSave: {
@@ -102,19 +103,53 @@ export default {components: {
     return {
       showEditModal: false,
       sortOrders: {},
-      gridData:[{name: 'id', title: 'Id', type: 'number'},
-       {name: 'sex', title: 'Sex', type: 'select', options: ['M', 'F']},
-        {name: 'menuName', title: 'Menu Name', type: 'text'}
-        ],
-      grides:[{name: 'id', title: 'Id', type: 'number'},
-       {name: 'sex', title: 'Sex', type: 'select', options: ['M', 'F']},
-        {name: 'menuName', title: 'Menu Name', type: 'text'}
-        ]
+      columns:[
+          {name: 'email', title: 'Email', type: 'text'},
+          {name: 'sex', title: 'Sex', type: 'select', options: ['M', 'F']},
+          {name: 'email', title: 'Email', type: 'text'}]
     }
   },
   computed: {
+    isSelectedAll: {
+      get: function () {
+        var isCheckAll = true
+        for (var i in this.gridData) {
+          var item = this.gridData[i]
+          if (!item.isChecked) {
+            isCheckAll = false
+            break
+          }
+        }
+        return isCheckAll
+      },
+      set: function (newValue) {
+        console.log('set newValue:', newValue)
+        for (var i in this.gridData) {
+          var item = this.gridData[i]
+          Vue.set(item, 'isChecked', newValue)
+        }
+      }
+    }
   },
-  methods: {    
+  methods: {
+    sortBy: function (key) {
+      console.log('click sortBy:', key)
+      this.sortKey = key
+      var self = this
+      var newSort = this.sortOrders[key] ? (this.sortOrders[key] * -1) : -1
+      var orders = {}
+      this.columns.forEach(function (k) {
+        var keyName = k.name
+        console.log(k.name === key)
+        if (keyName === key) {
+          self.order = (newSort < 0 ? 'ASC' : 'DESC')
+          orders[keyName] = newSort
+        } else {
+          orders[keyName] = 1
+        }
+      })
+      this.$set('sortOrders', orders)
+    },
     select: function (entry) {
       this.selectedRow = entry
     },
@@ -122,11 +157,23 @@ export default {components: {
       console.log('edit')
       this.showEditModal = true
     },
-    delete: function () {
+    deletes: function () {
       console.log('delete')
     },
     add: function () {
       console.log('edit')
+    },
+    save: function () {
+      console.log('save')
+      this.showEditModal = false
+      var editGridData = []
+      for (var i in this.gridData) {
+        var tmp = this.gridData[i]
+        if (tmp.isChecked) {
+          editGridData.push(tmp)
+        }
+      }
+      this.onSave(editGridData)
     }
   }
 }

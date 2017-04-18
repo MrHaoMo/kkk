@@ -27,7 +27,6 @@ export default {
     value: String,
     type: {
       type: String,
-      required: true,
       validator: function (value) {
         console.log('value:', value)
         return ['text', 'textarea', 'select', 'number', 'date', 'checkbox', 'radio'].indexOf(value) >= 0

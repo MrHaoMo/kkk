@@ -3,7 +3,7 @@
 
 import Vue from 'vue'
 import router from './router'
-import filed from './components/grid'
+import filed from './components/filed'
 
 Vue.config.productionTip = false
 

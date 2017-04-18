@@ -1,43 +1,17 @@
 <style type="text/css">
-	body {
-		 font-family: Helvetica Neue, Arial, sans-serif;
-		 font-size: 14px;
-		 color: #444;
-		}
-				 
-				table {
-				 border: 2px solid #42b983;
-				 border-radius: 3px;
-				 background-color: #fff;
-				}
-			th {
-			 background-color: #42b983;
-			 color: rgba(255,255,255,0.66);
-			 cursor: pointer;
-			 -webkit-user-select: none;
-			 -moz-user-select: none;
-			 -user-select: none;
-			}
-			 
-			td {
-			 background-color: #f9f9f9;
-			}
-			 
-			th, td {
-			 min-width: 120px;
-			 padding: 10px 20px;
-			}
+	@import '../assets/css/bootstrap.min.css'
+	@import '../assets/css/bootstrap-table.min.css'
 </style>
 <template>			
 	
 	<div id="app">
 			<div class="dropdown">
-		        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		         {{title}}
 		        <span class="caret"></span>
 		         </button>
-		      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-			    <li v-for="item in content"><a href="#" @click='dian'>{{item.name}}</a></li>	    	    	    
+		      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+			    <li v-for="item in content"><a href="#" @click='dian'>{{item.names}}</a></li>	    	    	    
 			  </ul>
 			 </div>
 			<form id="search">
@@ -77,12 +51,12 @@
 	isshow:false,
 	showall:false,
 	title:'zs',
-	head:['name','power','dates','mark'],
+	head:['names','power','dates','mark'],
 	content:
 		[
-		{name:'zs',power:'20',dates:69,mark:490},
-		{name:'rzs',power:'210',dates:769,mark:740},
-		{name:'zts',power:'240',dates:649,mark:420}
+		{names:'zs',power:'20',dates:69,mark:490},
+		{names:'rzs',power:'210',dates:769,mark:740},
+		{names:'zts',power:'240',dates:649,mark:420}
 		]	
    	}	
     },
